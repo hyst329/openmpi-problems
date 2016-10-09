@@ -11,36 +11,28 @@ int main(int argc, char **argv) {
   const int ARRAY_SIZE = 20;
   int x[ARRAY_SIZE], y[ARRAY_SIZE], z1[ARRAY_SIZE], z2[ARRAY_SIZE];
   int *indices = new int[size], *counts = new int[size];
+  for (int i = 0; i < size; i++) {
+    counts[i] = (ARRAY_SIZE / size) + (i < (ARRAY_SIZE % size));
+    indices[i] = i ? indices[i - 1] + counts[i - 1] : 0;
+  }
   if (!rank) {
     srand(time(0));
     printf("x = ");
     for (int &i : x) {
       i = rand() % 1000;
-      printf("%d ", i);
+      printf("%3d ", i);
     }
     printf("\n");
     printf("y = ");
     for (int &i : y) {
       i = rand() % 1000;
-      printf("%d ", i);
+      printf("%3d ", i);
     }
     printf("\n");
     for (int i = 0; i < size; i++) {
-      counts[i] = (ARRAY_SIZE / size) + (i < (ARRAY_SIZE % size));
-      indices[i] = i ? indices[i - 1] + counts[i - 1] : 0;
       MPI_Send(x + indices[i], counts[i], MPI_INT, i, 0, MPI_COMM_WORLD);
       MPI_Send(y + indices[i], counts[i], MPI_INT, i, 1, MPI_COMM_WORLD);
     }
-    // printf("counts = ");
-    // for (int i = 0; i < size; i++) {
-    //   printf("%d ", counts[i]);
-    // }
-    // printf("\n");
-    // printf("indices = ");
-    // for (int i = 0; i < size; i++) {
-    //   printf("%d ", indices[i]);
-    // }
-    // printf("\n");
   }
   int c = counts[rank];
   int *buf1 = new int[c], *buf2 = new int[c];
@@ -62,12 +54,12 @@ int main(int argc, char **argv) {
     }
     printf("z1 = ");
     for (int i : z1) {
-      printf("%d ", i);
+      printf("%4d ", i);
     }
     printf("\n");
     printf("z2 = ");
     for (int i : z2) {
-      printf("%d ", i);
+      printf("%6d ", i);
     }
     printf("\n");
   }
