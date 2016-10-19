@@ -1,15 +1,14 @@
 #include <mpi.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/time.h>
 #include <time.h>
 
 int main(int argc, char **argv) {
   MPI_Init(&argc, &argv);
   int size, rank;
-  const int ARRAY_SIZE = 1000;
+  const int ARRAY_SIZE = 10000;
   int a[ARRAY_SIZE], b[ARRAY_SIZE];
-  timeval start, end;
+  int64_t start, end;
   MPI_Comm_size(MPI_COMM_WORLD, &size);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   if (size != 2) {
@@ -26,12 +25,11 @@ int main(int argc, char **argv) {
       for (int i = 0; i < s; i++) {
         a[i] = rand() % 1000;
       }
-      gettimeofday(&start, nullptr);
+      start = clock();
       MPI_Send(a, s, MPI_INT, 1, s, MPI_COMM_WORLD);
       MPI_Recv(a, s, MPI_INT, 1, ARRAY_SIZE + s, MPI_COMM_WORLD, nullptr);
-      gettimeofday(&end, nullptr);
-      int64_t diff = (end.tv_sec - start.tv_sec) * 1000000LL +
-                     (end.tv_usec - start.tv_usec);
+      end = clock();
+      int64_t diff = end - start;
       printf("Time in usec for %i: %lli\n", s, diff);
     } else {
       MPI_Recv(b, s, MPI_INT, 0, s, MPI_COMM_WORLD, nullptr);
