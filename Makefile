@@ -1,7 +1,10 @@
 CXX = mpicxx -std=c++14
 
-.PHONY: all
+.PHONY: all clean
 all: p01 p02 p03 p04 p05 p06 p07 p08
 
-p01: p%: p%.cpp
+p%: p%.cpp
 	$(CXX) $^ -o $@
+
+clean:
+	rm -f p*.exe p*.
